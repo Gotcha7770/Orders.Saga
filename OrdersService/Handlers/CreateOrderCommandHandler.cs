@@ -15,7 +15,7 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Ord
     
     public async Task<Order> Handle(CreateOrderCommand command, CancellationToken cancellationToken)
     {
-        var order = new Order(command.OrderId, command.UserId, DateTimeOffset.Now.UtcDateTime);
+        var order = new Order(command.OrderId, command.UserId, Models.OrderState.Pending, DateTimeOffset.Now.UtcDateTime);
         _dbContext.Orders.Add(order);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
