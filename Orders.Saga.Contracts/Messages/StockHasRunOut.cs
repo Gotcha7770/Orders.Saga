@@ -1,7 +1,6 @@
 ﻿namespace Orders.Saga.Contracts.Messages;
 
-public interface StockReserved
+public interface StockHasRunOut
 {
     Guid OrderId { get; }
-    int ProductId { get; }
 }
