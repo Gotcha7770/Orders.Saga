@@ -27,10 +27,20 @@ builder.Services.AddMassTransit(x =>
 {
     x.UsingRabbitMq((context, cfg) =>
     {
-        
+        cfg.Host("localhost", "/", h =>
+        {
+            h.Username("admin");
+            h.Password("rabbitmq");
+        });
+
+        // cfg.ReceiveEndpoint("order-events-listener", e =>
+        // {
+        //     e.Consumer<OrderCreatedConsumer>();
+        // });
     });
 });
 
+//automatically handles the starting/stopping of the bus
 builder.Services.AddMassTransitHostedService();
 
 var app = builder.Build();
