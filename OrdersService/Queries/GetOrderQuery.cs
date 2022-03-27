@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Orders.Saga.Queries;
+namespace OrdersService.Queries;
 
 public class GetOrderQuery : IRequest
 {

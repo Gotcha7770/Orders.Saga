@@ -4,7 +4,6 @@
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>disable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <RootNamespace>Orders.Saga</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -22,10 +21,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Orders.Saga.Contracts\Orders.Saga.Contracts.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Consumers" />
     </ItemGroup>
 
 </Project>

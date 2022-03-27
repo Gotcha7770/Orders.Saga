@@ -1,9 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Orders.Saga.Commands;
-using Orders.Saga.Queries;
+using OrdersService.Commands;
+using OrdersService.Queries;
 
-namespace Orders.Saga.Controllers;
+namespace OrdersService.Controllers;
 
 [ApiController]
 [Route("api/orders/")]

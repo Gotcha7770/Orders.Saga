@@ -1,4 +1,4 @@
-﻿namespace Orders.Saga.Models;
+﻿namespace OrdersService.Models;
 
 public enum OrderState
 {

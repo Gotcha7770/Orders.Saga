@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Orders.Saga.Migrations
+namespace OrdersService.Migrations
 {
     public partial class InitialCreate : Migration
     {

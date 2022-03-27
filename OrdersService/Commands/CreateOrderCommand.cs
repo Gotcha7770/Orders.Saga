@@ -1,7 +1,7 @@
 ﻿using MediatR;
-using Orders.Saga.Models;
+using OrdersService.Models;
 
-namespace Orders.Saga.Commands;
+namespace OrdersService.Commands;
 
 public class CreateOrderCommand : IRequest<Order>
 {

@@ -1,7 +1,7 @@
 ﻿using Automatonymous;
 using Orders.Saga.Contracts.Messages;
 
-namespace Orders.Saga;
+namespace OrdersService;
 
 public class OrderSaga : SagaStateMachineInstance
 {

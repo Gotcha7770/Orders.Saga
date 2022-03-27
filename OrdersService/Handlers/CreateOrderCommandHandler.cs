@@ -1,10 +1,10 @@
 ﻿using MassTransit;
 using MediatR;
-using Orders.Saga.Commands;
 using Orders.Saga.Contracts.Messages;
-using Orders.Saga.Models;
+using OrdersService.Commands;
+using OrdersService.Models;
 
-namespace Orders.Saga.Handlers;
+namespace OrdersService.Handlers;
 
 public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Order>
 {

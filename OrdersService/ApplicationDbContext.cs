@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Orders.Saga.Models;
+using OrdersService.Models;
 
-namespace Orders.Saga;
+namespace OrdersService;
 
 public class ApplicationDbContext : DbContext
 {

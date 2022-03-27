@@ -2,13 +2,13 @@ using System.Reflection;
 using MassTransit;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Orders.Saga;
+using OrdersService;
 
 var builder = WebApplication.CreateBuilder(args);
 
 //Add json files
 builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-    .AddJsonFile($"appsettings.Development.json", optional: true, reloadOnChange: true);
+    .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
 
 //Add db context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -48,6 +48,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI();
 }
