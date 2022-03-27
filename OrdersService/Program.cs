@@ -12,7 +12,7 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnCh
 
 //Add db context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("BloggingContext")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));
 
 // Add services to the container.
 builder.Services.AddControllers();
