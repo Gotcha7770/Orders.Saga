@@ -2,6 +2,7 @@ using System.Reflection;
 using MassTransit;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Orders.Saga.Contracts.Messages;
 using OrdersService;
 using OrdersService.Consumers;
 
@@ -29,6 +30,8 @@ builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<StockHasRunOutConsumer>();
+    x.AddConsumer<StocksReleasedConsumer>();
+    x.AddConsumer<PaymentCompletedConsumer>();
     
     x.UsingRabbitMq((context, cfg) =>
     {

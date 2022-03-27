@@ -22,6 +22,7 @@ builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<OrderCreatedConsumer>();
+    x.AddConsumer<PaymentRejectedConsumer>();
     
     // Configure host, virtual host and credentials
     x.UsingRabbitMq((context, cfg) =>

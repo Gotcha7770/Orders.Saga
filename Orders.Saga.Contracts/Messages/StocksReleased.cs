@@ -2,5 +2,5 @@
 
 public interface StocksReleased
 {
-    
+    Guid OrderId { get; }
 }
