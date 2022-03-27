@@ -35,6 +35,7 @@ public class OrderCreatedConsumer : IConsumer<OrderCreated>
             await _publishEndpoint.Publish<StockReserved>(new
             {
                 OrderId = context.Message.OrderId,
+                UserId = context.Message.UserId,
                 ProductId = freeProduct.Id
             });
         }

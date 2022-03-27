@@ -2,5 +2,6 @@
 
 public interface PaymentRejected
 {
-    
+    Guid OrderId { get; }
+    int ProductId { get; }
 }

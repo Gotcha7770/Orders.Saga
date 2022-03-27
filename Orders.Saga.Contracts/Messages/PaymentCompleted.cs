@@ -2,5 +2,5 @@
 
 public interface PaymentCompleted
 {
-    
+    Guid OrderId { get; }
 }
