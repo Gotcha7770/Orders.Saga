@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Orders.Saga.Commands;
+using Orders.Saga.Queries;
 
 namespace Orders.Saga.Controllers;
 
@@ -14,12 +15,20 @@ public class OrdersController : ControllerBase
     {
         _mediator = mediator;
     }
-    
+
+    [HttpGet]
+    public async Task<IActionResult> Get([FromQuery] Guid orderId)
+    {
+        var order = _mediator.Send(new GetOrderQuery(orderId));
+
+        return Ok(order);
+    }
+
     [HttpPost]
     public async Task<IActionResult> CreateOrder([FromBody] CreateOrderCommand command)
     {
-        var id = await _mediator.Send(command);
+        var order = await _mediator.Send(command);
 
-        return Ok(id);
+        return Created($"api/orders/{order.Id}", order);
     }
 }

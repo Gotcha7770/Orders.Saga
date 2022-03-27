@@ -1,9 +1,10 @@
 ﻿using MediatR;
 using Orders.Saga.Commands;
+using Orders.Saga.Models;
 
 namespace Orders.Saga.Handlers;
 
-public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Guid>
+public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Order>
 {
     private readonly ApplicationDbContext _dbContext;
 
@@ -12,8 +13,12 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Gui
         _dbContext = dbContext;
     }
     
-    public Task<Guid> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
+    public async Task<Order> Handle(CreateOrderCommand command, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var order = new Order(command.OrderId, command.UserId, DateTimeOffset.Now.UtcDateTime);
+        _dbContext.Orders.Add(order);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return order;
     }
 }

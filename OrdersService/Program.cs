@@ -1,4 +1,3 @@
-using System.Configuration;
 using System.Reflection;
 using MassTransit;
 using MediatR;
