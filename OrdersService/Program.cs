@@ -3,6 +3,7 @@ using MassTransit;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using OrdersService;
+using OrdersService.Consumers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,8 @@ builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 // Add MassTransit
 builder.Services.AddMassTransit(x =>
 {
+    x.AddConsumer<StockHasRunOutConsumer>();
+    
     x.UsingRabbitMq((context, cfg) =>
     {
         // Configure host, virtual host and credentials
@@ -35,6 +38,9 @@ builder.Services.AddMassTransit(x =>
             h.Username("admin");
             h.Password("rabbitmq");
         });
+        
+        // Configure endpoints to handle events
+        cfg.ConfigureEndpoints(context);
     });
 });
 
