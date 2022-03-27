@@ -19,7 +19,7 @@ public class OrdersController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> Get([FromQuery] Guid orderId)
     {
-        var order = _mediator.Send(new GetOrderQuery(orderId));
+        var order = await _mediator.Send(new GetOrderQuery(orderId));
 
         return Ok(order);
     }
