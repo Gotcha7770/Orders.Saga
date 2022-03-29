@@ -2,15 +2,18 @@ using System.Reflection;
 using MassTransit;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Orders.Saga.Contracts.Messages;
 using OrdersService;
 using OrdersService.Consumers;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add json files
 builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
     .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
+
+// Add Serilog
+builder.Host.UseSerilog((context, cfg) => cfg.ReadFrom.Configuration(context.Configuration));
 
 // Add db context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -62,7 +65,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
+app.UseSerilogRequestLogging();
 
 app.MapControllers();
 
