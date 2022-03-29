@@ -1,8 +1,9 @@
 ﻿using MediatR;
+using OrdersService.Models;
 
 namespace OrdersService.Queries;
 
-public class GetOrderQuery : IRequest
+public class GetOrderQuery : IRequest<Order>
 {
     public Guid Id { get; }
 

@@ -16,12 +16,20 @@ public class OrdersController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> Get([FromQuery] Guid orderId)
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> Get([FromQuery] Guid id)
     {
-        var order = await _mediator.Send(new GetOrderQuery(orderId));
+        var order = await _mediator.Send(new GetOrderQuery(id));
 
         return Ok(order);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var orders = await _mediator.Send(new GetOrdersQuery());
+
+        return Ok(orders);
     }
 
     [HttpPost]
@@ -29,6 +37,6 @@ public class OrdersController : ControllerBase
     {
         var order = await _mediator.Send(command);
 
-        return Created($"api/orders/{order.Id}", order);
+        return Created($"{HttpContext.Request.PathBase}/api/orders/{order.Id}", order);
     }
 }
