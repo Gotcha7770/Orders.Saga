@@ -21,8 +21,7 @@ builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 // Add MassTransit
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumer<OrderCreatedConsumer>();
-    x.AddConsumer<PaymentRejectedConsumer>();
+    x.AddConsumer<ReserveStockConsumer>();
     
     // Configure host, virtual host and credentials
     x.UsingRabbitMq((context, cfg) =>
@@ -37,9 +36,6 @@ builder.Services.AddMassTransit(x =>
         cfg.ConfigureEndpoints(context);
     });
 });
-
-// Automatically handles the starting/stopping of the bus
-builder.Services.AddMassTransitHostedService();
 
 var app = builder.Build();
 
