@@ -3,7 +3,7 @@ using MassTransit;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using OrdersService;
-using OrdersService.Consumers;
+using OrdersService.OrderSaga;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,7 +13,15 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnCh
     .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
 
 // Add Serilog
-builder.Host.UseSerilog((context, cfg) => cfg.ReadFrom.Configuration(context.Configuration));
+builder.Host.UseSerilog((context, cfg) =>
+{
+    cfg.ReadFrom.Configuration(context.Configuration);
+    
+    if (context.HostingEnvironment.IsProduction())
+        cfg.MinimumLevel.Information();
+    else
+        cfg.MinimumLevel.Debug();
+});
 
 // Add db context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -29,15 +37,18 @@ builder.Services.AddSwaggerGen();
 // Add mediatr for assembly
 builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 
+
 // Add MassTransit
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumer<StockHasRunOutConsumer>();
-    x.AddConsumer<StocksReleasedConsumer>();
-    x.AddConsumer<PaymentCompletedConsumer>();
+    // Configure scheduling to use timeouts
+    var schedulerEndpoint = new Uri("queue:scheduler");
+    x.AddMessageScheduler(schedulerEndpoint);
     
     x.UsingRabbitMq((context, cfg) =>
     {
+        cfg.UseMessageScheduler(schedulerEndpoint);
+        
         // Configure host, virtual host and credentials
         cfg.Host("localhost", "/", h =>
         {
@@ -48,10 +59,18 @@ builder.Services.AddMassTransit(x =>
         // Configure endpoints to handle events
         cfg.ConfigureEndpoints(context);
     });
-});
 
-// Automatically handles the starting/stopping of the bus
-builder.Services.AddMassTransitHostedService();
+    // Configure saga state machine
+    x.AddSagaStateMachine<OrderStateMachine, OrderSaga>()
+        .InMemoryRepository();
+    
+    //x.AddRequestClient<ReserveStock>(new Uri("exchange:order-status"));
+    
+    // .EntityFrameworkRepository(cfg =>
+    // {
+    //     cfg.ExistingDbContext<ApplicationDbContext>();
+    // });
+});
 
 var app = builder.Build();
 

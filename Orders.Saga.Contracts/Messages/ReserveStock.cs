@@ -1,7 +1,7 @@
 ﻿namespace Orders.Saga.Contracts.Messages;
 
-public interface OrderCompleted
+public interface ReserveStock
 {
     Guid OrderId { get; }
-    DateTime Completed { get; }
+    Guid UserId { get; }
 }
