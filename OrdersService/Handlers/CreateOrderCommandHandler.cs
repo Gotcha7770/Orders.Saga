@@ -21,7 +21,7 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Ord
     {
         var order = new Order
         {
-            Id = command.OrderId,
+            Id = Guid.NewGuid(),
             UserId = command.UserId,
             State = OrderState.Pending,
             OrderDate = DateTimeOffset.Now.UtcDateTime
