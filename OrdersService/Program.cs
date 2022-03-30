@@ -37,7 +37,6 @@ builder.Services.AddSwaggerGen();
 // Add mediatr for assembly
 builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 
-
 // Add MassTransit
 builder.Services.AddMassTransit(x =>
 {
