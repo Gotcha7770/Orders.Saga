@@ -18,9 +18,15 @@ public class OrderStateMachine : MassTransitStateMachine<OrderSaga>
 
         Request(() => ReserveStock,
             // x => x.ProcessOrderRequestId, // Optional
-            r => {
+            cfg => {
                 //r.ServiceAddress = settings.ProcessOrderServiceAddress; //otherwise publish
-                r.Timeout = TimeSpan.FromMinutes(1);
+                cfg.Timeout = TimeSpan.FromMinutes(1);
+            });
+        
+        Request(() => Checkout,
+            cfg =>
+            {
+                cfg.Timeout = TimeSpan.FromMinutes(1);
             });
         
         Initially(
@@ -35,33 +41,43 @@ public class OrderStateMachine : MassTransitStateMachine<OrderSaga>
                     OrderId = x.Saga.CorrelationId,
                     UserId = x.Saga.CreatedBy
                 }))
-                //.TransitionTo(Pending)
+                .TransitionTo(Pending)
                 .TransitionTo(ReserveStock.Pending));
 
         During(ReserveStock.Pending,
             When(ReserveStock.Completed)
-                .TransitionTo(Completed),
+                .Then(x => x.Saga.ProductId = x.Message.ProductId)
+                .Request(Checkout, x => x.Init<Checkout>(new
+                {
+                    OrderId = x.Saga.CorrelationId,
+                    UserId = x.Saga.CreatedBy
+                }))
+                .TransitionTo(Checkout.Pending),
             When(ReserveStock.Faulted)
                 .TransitionTo(Rejected),
             When(ReserveStock.TimeoutExpired)
                 .TransitionTo(Rejected));
+        
+        During(ReserveStock.Pending,
+            When(Checkout.Completed)
+                .Then(x => x.Saga.CompletedOn = DateTimeOffset.UtcNow.DateTime)
+                .PublishAsync(context => context.Init<OrderCompleted>(new
+                {
+                    OrderId = context.Saga.CorrelationId,
+                    Completed = context.Saga.CompletedOn
+                }))
+                .TransitionTo(Completed),
+            When(Checkout.Faulted)
+                .TransitionTo(Rejected),
+            When(Checkout.TimeoutExpired)
+                .TransitionTo(Rejected));
 
         //??? CompositeEvent(() => OrderCompleted, x => x.Completed, StockReserved, PaymentCompleted);
-
-        // During(Pending,
-        //     When(OrderCompleted)
-        //         .Then(x => x.Saga.CompletedOn = x.Message.Completed)
-        //         .PublishAsync(context => context.Init<OrderCompleted>(new
-        //         {
-        //             OrderId = context.Saga.CorrelationId,
-        //             Completed = context.Saga.CompletedOn
-        //         }))
-        //         .TransitionTo(Completed));
     }
     
     public Event<OrderCreated> OrderCreated { get; init; }
     public Event<OrderCompleted> OrderCompleted { get; init; }
     
     public Request<OrderSaga, ReserveStock, StockReserved> ReserveStock { get; init; }
-    //public Request<OrderSaga, RequestPayment, PaymentCompleted> RequestPayment { get; private set; }
+    public Request<OrderSaga, Checkout, PaymentCompleted> Checkout { get; init; }
 }

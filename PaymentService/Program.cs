@@ -21,7 +21,7 @@ builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 // Add MassTransit
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumer<StockReservedConsumer>();
+    x.AddConsumer<CheckoutConsumer>();
     
     // Configure host, virtual host and credentials
     x.UsingRabbitMq((context, cfg) =>
@@ -34,7 +34,6 @@ builder.Services.AddMassTransit(x =>
         
         // Configure endpoints to handle events
         cfg.ConfigureEndpoints(context);
-        
     });
 });
 
