@@ -5,6 +5,7 @@ using StockService.Models;
 
 namespace StockService.Consumers;
 
+// ReSharper disable once ClassNeverInstantiated.Global
 public class ReserveStockConsumer : IConsumer<ReserveStock>
 {
     private readonly ApplicationDbContext _dbContext;

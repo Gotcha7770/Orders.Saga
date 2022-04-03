@@ -5,14 +5,11 @@ namespace OrdersService.OrderSaga;
 
 public class OrderStateMachine : MassTransitStateMachine<OrderSaga>
 {
-    public State Pending { get; init; }
     public State Completed { get; init; }
     public State Rejected { get; init; }
 
     public OrderStateMachine()
     {
-        InstanceState(x => x.CurrentState, Pending, Completed, Rejected);
-        
         Event(() => OrderCreated, x => x.CorrelateById(context => context.Message.OrderId));
         Event(() => OrderCompleted, x => x.CorrelateById(context => context.Message.OrderId));
 
@@ -29,19 +26,23 @@ public class OrderStateMachine : MassTransitStateMachine<OrderSaga>
                 cfg.Timeout = TimeSpan.FromMinutes(1);
             });
         
+        InstanceState(x => x.CurrentState, 
+            ReserveStock.Pending,
+            Checkout.Pending,
+            Completed, Rejected);
+        
         Initially(
             When(OrderCreated)
                 .Then(x =>
                 {
                     x.Saga.CreatedBy = x.Message.UserId;
-                    x.Saga.CreatedOn = x.Message.Created;
+                    x.Saga.CreatedOn = DateTimeOffset.UtcNow.DateTime;
                 })
                 .Request(ReserveStock, x => x.Init<ReserveStock>(new
                 {
                     OrderId = x.Saga.CorrelationId,
                     UserId = x.Saga.CreatedBy
                 }))
-                .TransitionTo(Pending)
                 .TransitionTo(ReserveStock.Pending));
 
         During(ReserveStock.Pending,
@@ -58,7 +59,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderSaga>
             When(ReserveStock.TimeoutExpired)
                 .TransitionTo(Rejected));
         
-        During(ReserveStock.Pending,
+        During(Checkout.Pending,
             When(Checkout.Completed)
                 .Then(x => x.Saga.CompletedOn = DateTimeOffset.UtcNow.DateTime)
                 .PublishAsync(context => context.Init<OrderCompleted>(new
@@ -71,8 +72,10 @@ public class OrderStateMachine : MassTransitStateMachine<OrderSaga>
                 .TransitionTo(Rejected),
             When(Checkout.TimeoutExpired)
                 .TransitionTo(Rejected));
+        
+        //During(Completed, Rejected, Ignore());
 
-        //??? CompositeEvent(() => OrderCompleted, x => x.Completed, StockReserved, PaymentCompleted);
+        //CompositeEvent(() => OrderCompleted, x => x.Completed, StockReserved, PaymentCompleted);
     }
     
     public Event<OrderCreated> OrderCreated { get; init; }

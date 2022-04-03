@@ -32,8 +32,7 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Ord
         await _publishEndpoint.Publish<OrderCreated>(new
         {
             OrderId = order.Id,
-            UserId = order.UserId,
-            Created = order.OrderDate
+            UserId = order.UserId
         },
             cancellationToken);
 
