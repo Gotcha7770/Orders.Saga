@@ -29,7 +29,8 @@ public class OrderStateMachine : MassTransitStateMachine<OrderSaga>
         InstanceState(x => x.CurrentState, 
             ReserveStock.Pending,
             Checkout.Pending,
-            Completed, Rejected);
+            Completed, 
+            Rejected);
         
         Initially(
             When(OrderCreated)
@@ -38,11 +39,11 @@ public class OrderStateMachine : MassTransitStateMachine<OrderSaga>
                     x.Saga.CreatedBy = x.Message.UserId;
                     x.Saga.CreatedOn = DateTimeOffset.UtcNow.DateTime;
                 })
-                .Request(ReserveStock, x => x.Init<ReserveStock>(new
+                .Request(ReserveStock, x => new ReserveStock
                 {
                     OrderId = x.Saga.CorrelationId,
                     UserId = x.Saga.CreatedBy
-                }))
+                })
                 .TransitionTo(ReserveStock.Pending));
 
         During(ReserveStock.Pending,

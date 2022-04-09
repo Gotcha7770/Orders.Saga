@@ -1,7 +1,7 @@
 ﻿namespace Orders.Saga.Contracts.Messages;
 
-public interface ReserveStock
+public record ReserveStock
 {
-    Guid OrderId { get; }
-    Guid UserId { get; }
+    public Guid OrderId { get; init; }
+    public Guid UserId { get; init; }
 }
