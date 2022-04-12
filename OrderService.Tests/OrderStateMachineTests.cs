@@ -11,11 +11,11 @@ using Xunit;
 
 namespace OrderService.Tests;
 
-public class OrderStateMachineTests : IClassFixture<StateMachineTestFixture<OrderStateMachine, OrderSaga>>
+public class OrderStateMachineTests : IClassFixture<StateMachineTestFixture<OrderStateMachine, OrderInstance>>
 {
-    private readonly StateMachineTestFixture<OrderStateMachine, OrderSaga> _testFixture;
+    private readonly StateMachineTestFixture<OrderStateMachine, OrderInstance> _testFixture;
 
-    public OrderStateMachineTests(StateMachineTestFixture<OrderStateMachine, OrderSaga> testFixture)
+    public OrderStateMachineTests(StateMachineTestFixture<OrderStateMachine, OrderInstance> testFixture)
     {
         _testFixture = testFixture;
     }
@@ -24,22 +24,6 @@ public class OrderStateMachineTests : IClassFixture<StateMachineTestFixture<Orde
     public async Task CreateOrderTest()
     {
         await using var provider = _testFixture.GetProvider();
-        // await using var provider = _testFixture.GetProvider((cfg) =>
-        // {
-        //     cfg.ReceiveEndpoint(e =>
-        //     {
-        //         e.Handler<ReserveStock>(async context =>
-        //         {
-        //             await context.RespondAsync(new StockReserved
-        //             {
-        //                 OrderId = context.Message.OrderId,
-        //                 UserId = context.Message.UserId,
-        //                 ProductId = 1
-        //             });
-        //         });
-        //     });
-        // });
-        
         var harness = provider.GetRequiredService<ITestHarness>();
         await harness.Start();
         
@@ -54,7 +38,7 @@ public class OrderStateMachineTests : IClassFixture<StateMachineTestFixture<Orde
         await harness.Consumed.Any<OrderCreated>().ShouldBeTrue();
         
         // OrderCreated event should be consumed by saga too
-        var sagaHarness = harness.GetSagaStateMachineHarness<OrderStateMachine, OrderSaga>();
+        var sagaHarness = harness.GetSagaStateMachineHarness<OrderStateMachine, OrderInstance>();
         await sagaHarness.Consumed.Any<OrderCreated>().ShouldBeTrue();
 
         // OrderCreated event should cause state machine created

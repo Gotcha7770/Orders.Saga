@@ -3,7 +3,7 @@ using Orders.Saga.Contracts.Messages;
 
 namespace OrdersService.OrderSaga;
 
-public class OrderStateMachine : MassTransitStateMachine<OrderSaga>
+public class OrderStateMachine : MassTransitStateMachine<OrderInstance>
 {
     public State Completed { get; init; }
     public State Rejected { get; init; }
@@ -13,18 +13,9 @@ public class OrderStateMachine : MassTransitStateMachine<OrderSaga>
         Event(() => OrderCreated, x => x.CorrelateById(context => context.Message.OrderId));
         Event(() => OrderCompleted, x => x.CorrelateById(context => context.Message.OrderId));
 
-        Request(() => ReserveStock,
-            // x => x.ProcessOrderRequestId, // Optional
-            cfg => {
-                //r.ServiceAddress = settings.ProcessOrderServiceAddress; //otherwise publish
-                cfg.Timeout = TimeSpan.FromMinutes(1);
-            });
+        Request(() => ReserveStock, cfg => { cfg.Timeout = TimeSpan.FromMinutes(1); });
         
-        Request(() => Checkout,
-            cfg =>
-            {
-                cfg.Timeout = TimeSpan.FromMinutes(1);
-            });
+        Request(() => Checkout, cfg => { cfg.Timeout = TimeSpan.FromMinutes(1); });
         
         InstanceState(x => x.CurrentState, 
             ReserveStock.Pending,
@@ -37,7 +28,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderSaga>
                 .Then(x =>
                 {
                     x.Saga.CreatedBy = x.Message.UserId;
-                    x.Saga.CreatedOn = DateTimeOffset.UtcNow.DateTime;
+                    x.Saga.CreatedOn = DateTime.UtcNow;
                 })
                 .Request(ReserveStock, x => new ReserveStock
                 {
@@ -62,7 +53,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderSaga>
         
         During(Checkout.Pending,
             When(Checkout.Completed)
-                .Then(x => x.Saga.CompletedOn = DateTimeOffset.UtcNow.DateTime)
+                .Then(x => x.Saga.CompletedOn = DateTime.UtcNow)
                 .PublishAsync(context => context.Init<OrderCompleted>(new
                 {
                     OrderId = context.Saga.CorrelationId,
@@ -73,15 +64,11 @@ public class OrderStateMachine : MassTransitStateMachine<OrderSaga>
                 .TransitionTo(Rejected),
             When(Checkout.TimeoutExpired)
                 .TransitionTo(Rejected));
-        
-        //During(Completed, Rejected, Ignore());
-
-        //CompositeEvent(() => OrderCompleted, x => x.Completed, StockReserved, PaymentCompleted);
     }
     
     public Event<OrderCreated> OrderCreated { get; init; }
     public Event<OrderCompleted> OrderCompleted { get; init; }
     
-    public Request<OrderSaga, ReserveStock, StockReserved> ReserveStock { get; init; }
-    public Request<OrderSaga, Checkout, PaymentCompleted> Checkout { get; init; }
+    public Request<OrderInstance, ReserveStock, StockReserved> ReserveStock { get; init; }
+    public Request<OrderInstance, Checkout, PaymentCompleted> Checkout { get; init; }
 }

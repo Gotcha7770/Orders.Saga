@@ -24,7 +24,7 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Ord
             Id = Guid.NewGuid(),
             UserId = command.UserId,
             State = OrderState.Pending,
-            OrderDate = DateTimeOffset.Now.UtcDateTime
+            OrderDate = DateTime.UtcNow
         };
         _dbContext.Orders.Add(order);
         await _dbContext.SaveChangesAsync(cancellationToken);

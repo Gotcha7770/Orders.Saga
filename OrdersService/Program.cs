@@ -1,5 +1,6 @@
 using System.Reflection;
 using MassTransit;
+using MassTransit.EntityFrameworkCoreIntegration;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using OrdersService;
@@ -60,15 +61,17 @@ builder.Services.AddMassTransit(x =>
     });
 
     // Configure saga state machine
-    x.AddSagaStateMachine<OrderStateMachine, OrderSaga>()
-        .InMemoryRepository();
-    
-    //x.AddRequestClient<ReserveStock>(new Uri("exchange:order-status"));
-    
-    // .EntityFrameworkRepository(cfg =>
-    // {
-    //     cfg.ExistingDbContext<ApplicationDbContext>();
-    // });
+    x.AddSagaStateMachine<OrderStateMachine, OrderInstance>()
+        .EntityFrameworkRepository(cfg =>
+        {
+            cfg.ConcurrencyMode = ConcurrencyMode.Pessimistic;
+            cfg.LockStatementProvider = new PostgresLockStatementProvider();
+            
+            cfg.AddDbContext<DbContext, OrderSagaDbContext>((_, bldr) =>
+            {
+                bldr.UseNpgsql(builder.Configuration.GetConnectionString("SagaDbConnection"));
+            });
+        });
 });
 
 var app = builder.Build();

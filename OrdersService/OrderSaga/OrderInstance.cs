@@ -2,7 +2,7 @@ using MassTransit;
 
 namespace OrdersService.OrderSaga;
 
-public class OrderSaga : SagaStateMachineInstance
+public class OrderInstance : SagaStateMachineInstance
 {
     public Guid CorrelationId { get; set; }
     public int CurrentState { get; set; }
