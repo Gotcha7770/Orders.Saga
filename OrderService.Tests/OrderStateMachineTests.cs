@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using MassTransit;
 using MassTransit.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Orders.Saga.Contracts.Messages;
@@ -11,11 +10,11 @@ using Xunit;
 
 namespace OrderService.Tests;
 
-public class OrderStateMachineTests : IClassFixture<StateMachineTestFixture<OrderStateMachine, OrderInstance>>
+public class OrderStateMachineTests : IClassFixture<StateMachineTestFixture<OrderStateMachine, Order>>
 {
-    private readonly StateMachineTestFixture<OrderStateMachine, OrderInstance> _testFixture;
+    private readonly StateMachineTestFixture<OrderStateMachine, Order> _testFixture;
 
-    public OrderStateMachineTests(StateMachineTestFixture<OrderStateMachine, OrderInstance> testFixture)
+    public OrderStateMachineTests(StateMachineTestFixture<OrderStateMachine, Order> testFixture)
     {
         _testFixture = testFixture;
     }
@@ -29,23 +28,19 @@ public class OrderStateMachineTests : IClassFixture<StateMachineTestFixture<Orde
         
         var sagaId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        await harness.Bus.Publish<OrderCreated>(new
-        {
-            OrderId = sagaId,
-            UserId = userId
-        });
+        await harness.Bus.Publish(new OrderCreated(sagaId, userId));
         
         await harness.Consumed.Any<OrderCreated>().ShouldBeTrue();
         
         // OrderCreated event should be consumed by saga too
-        var sagaHarness = harness.GetSagaStateMachineHarness<OrderStateMachine, OrderInstance>();
+        var sagaHarness = harness.GetSagaStateMachineHarness<OrderStateMachine, Order>();
         await sagaHarness.Consumed.Any<OrderCreated>().ShouldBeTrue();
 
         // OrderCreated event should cause state machine created
         var instance = sagaHarness.Created.ContainsInState(sagaId, sagaHarness.StateMachine, sagaHarness.StateMachine.ReserveStock.Pending);
         instance.ShouldNotBeNull();
-        instance.CreatedBy.ShouldBe(userId);
-        instance.CreatedOn.Date.ShouldBe(DateTimeOffset.UtcNow.Date);
+        instance.UserId.ShouldBe(userId);
+        instance.CreatedOn.Date.ShouldBe(DateTime.UtcNow.Date);
 
         await harness.Published.Any<ReserveStock>().ShouldBeTrue();
     }

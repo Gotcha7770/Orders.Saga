@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using Orders.Saga;
 using OrdersService;
 
 #nullable disable
@@ -23,22 +22,28 @@ namespace OrdersService.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Orders.Saga.Models.Order", b =>
+            modelBuilder.Entity("OrdersService.OrderSaga.Order", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("CorrelationId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("OrderDate")
+                    b.Property<DateTime>("CompletedOn")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("State")
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("CurrentState")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ProductId")
                         .HasColumnType("integer");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
-                    b.HasKey("Id");
+                    b.HasKey("CorrelationId");
 
                     b.ToTable("Orders");
                 });

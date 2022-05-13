@@ -29,4 +29,9 @@
       <ProjectReference Include="..\Orders.Saga.Contracts\Orders.Saga.Contracts.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Migrations" />
+      <Folder Include="Models" />
+    </ItemGroup>
+
 </Project>

@@ -35,8 +35,8 @@ public class OrdersController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateOrder([FromBody] CreateOrderCommand command)
     {
-        var order = await _mediator.Send(command);
+        var id = await _mediator.Send(command);
 
-        return Created($"{HttpContext.Request.PathBase}/api/orders/{order.Id}", order);
+        return Created($"{HttpContext.Request.PathBase}/api/orders/{id}", null);
     }
 }

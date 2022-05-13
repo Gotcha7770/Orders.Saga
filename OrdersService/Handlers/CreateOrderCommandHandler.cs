@@ -2,40 +2,24 @@
 using MediatR;
 using Orders.Saga.Contracts.Messages;
 using OrdersService.Commands;
-using OrdersService.Models;
 
 namespace OrdersService.Handlers;
 
-public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Order>
+public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Guid>
 {
-    private readonly ApplicationDbContext _dbContext;
     private readonly IPublishEndpoint _publishEndpoint;
 
     public CreateOrderCommandHandler(ApplicationDbContext dbContext,IPublishEndpoint publishEndpoint)
     {
-        _dbContext = dbContext;
         _publishEndpoint = publishEndpoint;
     }
     
-    public async Task<Order> Handle(CreateOrderCommand command, CancellationToken cancellationToken)
+    public async Task<Guid> Handle(CreateOrderCommand command, CancellationToken cancellationToken)
     {
-        var order = new Order
-        {
-            Id = Guid.NewGuid(),
-            UserId = command.UserId,
-            State = OrderState.Pending,
-            OrderDate = DateTime.UtcNow
-        };
-        _dbContext.Orders.Add(order);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        var id = Guid.NewGuid();
+        var message = new OrderCreated(Guid.NewGuid(), command.UserId);
+        await _publishEndpoint.Publish(message, cancellationToken);
 
-        await _publishEndpoint.Publish<OrderCreated>(new
-        {
-            OrderId = order.Id,
-            UserId = order.UserId
-        },
-            cancellationToken);
-
-        return order;
+        return id;
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OrdersService.Models;
+using OrdersService.OrderSaga;
 
 namespace OrdersService;
 
@@ -9,4 +9,10 @@ public class ApplicationDbContext : DbContext
     { }
     
     public DbSet<Order> Orders { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Order>()
+            .HasKey(x => x.CorrelationId);
+    }
 }

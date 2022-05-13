@@ -61,16 +61,16 @@ builder.Services.AddMassTransit(x =>
     });
 
     // Configure saga state machine
-    x.AddSagaStateMachine<OrderStateMachine, OrderInstance>()
+    x.AddSagaStateMachine<OrderStateMachine, Order>()
         .EntityFrameworkRepository(cfg =>
         {
             cfg.ConcurrencyMode = ConcurrencyMode.Pessimistic;
             cfg.LockStatementProvider = new PostgresLockStatementProvider();
-            
-            cfg.AddDbContext<DbContext, OrderSagaDbContext>((_, bldr) =>
-            {
-                bldr.UseNpgsql(builder.Configuration.GetConnectionString("SagaDbConnection"));
-            });
+            cfg.ExistingDbContext<ApplicationDbContext>();
+            // cfg.AddDbContext<DbContext, OrderSagaDbContext>((_, bldr) =>
+            // {
+            //     bldr.UseNpgsql(builder.Configuration.GetConnectionString("SagaDbConnection"));
+            // });
         });
 });
 

@@ -1,7 +1,7 @@
 ﻿namespace Orders.Saga.Contracts.Messages;
 
-public interface Checkout
+public record Checkout
 {
-    Guid OrderId { get; set; }
-    Guid UserId { get; set; }
-}
+    public Guid OrderId { get; init; }
+    public Guid UserId { get; init; }
+};

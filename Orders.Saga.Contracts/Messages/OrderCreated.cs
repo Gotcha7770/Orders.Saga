@@ -1,8 +1,3 @@
 ﻿namespace Orders.Saga.Contracts.Messages;
 
-public interface OrderCreated
-{
-    Guid OrderId { get; }
-    Guid UserId { get; }
-    DateTime Created { get; }
-}
+public record OrderCreated(Guid OrderId, Guid UserId);

@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using OrdersService.Models;
+using OrdersService.OrderSaga;
 
 namespace OrdersService.Queries;
 
