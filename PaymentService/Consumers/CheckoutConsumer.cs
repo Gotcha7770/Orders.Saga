@@ -20,9 +20,6 @@ public class CheckoutConsumer : IConsumer<Checkout>
         if (user is not { CanPay: true })
             throw new InvalidOperationException("User cannot pay for the order!");
 
-        await context.RespondAsync<PaymentCompleted>(new
-        {
-            OrderId = context.Message.OrderId,
-        });
+        await context.RespondAsync(new PaymentCompleted(context.Message.OrderId));
     }
 }

@@ -2,6 +2,7 @@ using System.Reflection;
 using MassTransit;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using StockService;
 using StockService.Consumers;
 
@@ -10,6 +11,17 @@ var builder = WebApplication.CreateBuilder(args);
 // Add json files
 builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
     .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
+
+// Add Serilog
+builder.Host.UseSerilog((context, cfg) =>
+{
+    cfg.ReadFrom.Configuration(context.Configuration);
+    
+    if (context.HostingEnvironment.IsProduction())
+        cfg.MinimumLevel.Information();
+    else
+        cfg.MinimumLevel.Debug();
+});
 
 // Add db context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

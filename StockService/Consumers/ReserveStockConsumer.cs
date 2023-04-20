@@ -17,14 +17,14 @@ public class ReserveStockConsumer : IConsumer<ReserveStock>
     
     public async Task Consume(ConsumeContext<ReserveStock> context)
     {
-        var freeProduct = await _dbContext.Products.FirstOrDefaultAsync(x => x.State == ProductState.Free);
+        var freeProduct = await _dbContext.Products.OrderBy(x => x.Id).FirstOrDefaultAsync(x => x.State == ProductState.Free);
         if (freeProduct is null)
             throw new InvalidOperationException("No products left!");
 
         freeProduct.State = ProductState.Reserved;
         await _dbContext.SaveChangesAsync();
         
-        await context.RespondAsync<StockReserved>(new
+        await context.RespondAsync(new StockReserved
         {
             OrderId = context.Message.OrderId,
             UserId = context.Message.UserId,

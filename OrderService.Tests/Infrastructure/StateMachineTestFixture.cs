@@ -16,6 +16,8 @@ public class StateMachineTestFixture<TStateMachine, TInstance>
                 x.AddSagaStateMachine<TStateMachine, TInstance>()
                     .InMemoryRepository();
 
+                x.AddPublishMessageScheduler();
+                
                 x.UsingInMemory((context, cfg) =>
                 {
                     cfg.UseInMemoryScheduler();

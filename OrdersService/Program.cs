@@ -67,10 +67,6 @@ builder.Services.AddMassTransit(x =>
             cfg.ConcurrencyMode = ConcurrencyMode.Pessimistic;
             cfg.LockStatementProvider = new PostgresLockStatementProvider();
             cfg.ExistingDbContext<ApplicationDbContext>();
-            // cfg.AddDbContext<DbContext, OrderSagaDbContext>((_, bldr) =>
-            // {
-            //     bldr.UseNpgsql(builder.Configuration.GetConnectionString("SagaDbConnection"));
-            // });
         });
 });
 

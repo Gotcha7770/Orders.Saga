@@ -9,17 +9,16 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Gui
 {
     private readonly IPublishEndpoint _publishEndpoint;
 
-    public CreateOrderCommandHandler(ApplicationDbContext dbContext,IPublishEndpoint publishEndpoint)
+    public CreateOrderCommandHandler(IPublishEndpoint publishEndpoint)
     {
         _publishEndpoint = publishEndpoint;
     }
     
     public async Task<Guid> Handle(CreateOrderCommand command, CancellationToken cancellationToken)
     {
-        var id = Guid.NewGuid();
         var message = new OrderCreated(Guid.NewGuid(), command.UserId);
         await _publishEndpoint.Publish(message, cancellationToken);
 
-        return id;
+        return message.OrderId;
     }
 }
