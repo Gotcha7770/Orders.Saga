@@ -5,6 +5,8 @@ namespace OrdersService.OrderSaga;
 
 public class OrderStateMachine : MassTransitStateMachine<Order>
 {
+    // https://masstransit.io/documentation/patterns/saga/state-machine#custom
+
     public State Completed { get; init; }
     public State Rejected { get; init; }
 
