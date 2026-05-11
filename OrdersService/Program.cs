@@ -1,41 +1,31 @@
 using System.Reflection;
 using MassTransit;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OrdersService;
+using OrdersService.Commands;
 using OrdersService.Consumers;
+using OrdersService.Queries;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add json files
-builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-    .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
-
-// Add Serilog
 builder.Host.UseSerilog((context, cfg) => cfg.ReadFrom.Configuration(context.Configuration));
 
-// Add db context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));
 
-// Add controllers
-builder.Services.AddControllers();
+builder.Services
+    .AddOpenApi()
+    .AddMediatR(Assembly.GetExecutingAssembly());
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-// Add mediatr for assembly
-builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
-
-// Add MassTransit
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<StockHasRunOutConsumer>();
     x.AddConsumer<StocksReleasedConsumer>();
     x.AddConsumer<PaymentCompletedConsumer>();
-    
+
     x.UsingRabbitMq((context, cfg) =>
     {
         // Configure host, virtual host and credentials
@@ -44,29 +34,42 @@ builder.Services.AddMassTransit(x =>
             h.Username("admin");
             h.Password("rabbitmq");
         });
-        
+
         // Configure endpoints to handle events
         cfg.ConfigureEndpoints(context);
     });
 });
 
-// Automatically handles the starting/stopping of the bus
-builder.Services.AddMassTransitHostedService();
-
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+app
+    .UseHttpsRedirection()
+    .UseSerilogRequestLogging();
 
-app.UseSerilogRequestLogging();
+app.MapGet("api/orders/{id:guid}", async (IMediator mediator, Guid id) =>
+{
+    var order = await mediator.Send(new GetOrderQuery { Id = id });
+    return Results.Ok(order);
+});
 
-app.MapControllers();
+app.MapGet("api/orders/", async (IMediator mediator) =>
+{
+    var orders = await mediator.Send(new GetOrdersQuery());
+
+    return Results.Ok(orders);
+});
+
+app.MapPost("api/orders/", async (IMediator mediator, [FromBody] CreateOrderCommand command, HttpContext httpContext) =>
+{
+    var order = await mediator.Send(command);
+
+    return Results.Created($"{httpContext.Request.PathBase}/api/orders/{order.Id}", order);
+});
 
 app.Run();

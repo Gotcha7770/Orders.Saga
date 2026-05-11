@@ -1,10 +1,12 @@
-﻿using MassTransit;
+﻿using JetBrains.Annotations;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Orders.Saga.Contracts.Messages;
 using OrdersService.Models;
 
 namespace OrdersService.Consumers;
 
+[UsedImplicitly]
 public class PaymentCompletedConsumer : IConsumer<PaymentCompleted>
 {
     private readonly ApplicationDbContext _dbContext;

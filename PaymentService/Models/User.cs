@@ -2,7 +2,7 @@
 
 public class User
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; init; }
     
-    public bool CanPay { get; set; }
+    public bool CanPay { get; init; }
 }

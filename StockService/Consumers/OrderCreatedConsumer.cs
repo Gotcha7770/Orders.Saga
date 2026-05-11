@@ -1,11 +1,12 @@
-﻿using MassTransit;
+﻿using JetBrains.Annotations;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Orders.Saga.Contracts.Messages;
 using StockService.Models;
 
 namespace StockService.Consumers;
 
-// ReSharper disable once ClassNeverInstantiated.Global
+[UsedImplicitly]
 public class OrderCreatedConsumer : IConsumer<OrderCreated>
 {
     private readonly ApplicationDbContext _dbContext;

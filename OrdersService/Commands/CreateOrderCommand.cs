@@ -3,9 +3,9 @@ using OrdersService.Models;
 
 namespace OrdersService.Commands;
 
-public class CreateOrderCommand : IRequest<Order>
+public record CreateOrderCommand : IRequest<Order>
 {
-    public Guid OrderId { get; set; }
+    public required Guid OrderId { get; init; }
     
-    public Guid UserId { get; set; }
+    public required Guid UserId { get; init; }
 }

@@ -3,5 +3,4 @@ using OrdersService.Models;
 
 namespace OrdersService.Queries;
 
-public class GetOrdersQuery : IRequest<Order[]>
-{ }
+public record GetOrdersQuery : IStreamRequest<Order>;

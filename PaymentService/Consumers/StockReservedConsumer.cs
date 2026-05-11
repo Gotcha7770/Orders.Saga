@@ -1,10 +1,11 @@
-﻿using MassTransit;
+﻿using JetBrains.Annotations;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Orders.Saga.Contracts.Messages;
 
 namespace PaymentService.Consumers;
 
-// ReSharper disable once ClassNeverInstantiated.Global
+[UsedImplicitly]
 public class StockReservedConsumer : IConsumer<StockReserved>
 {
     private readonly ApplicationDbContext _dbContext;
@@ -15,11 +16,11 @@ public class StockReservedConsumer : IConsumer<StockReserved>
         _dbContext = dbContext;
         _publishEndpoint = publishEndpoint;
     }
-    
+
     public async Task Consume(ConsumeContext<StockReserved> context)
     {
         var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == context.Message.UserId);
-        if (user is not {CanPay: true})
+        if (user is not { CanPay: true })
         {
             await _publishEndpoint.Publish<PaymentRejected>(new
             {

@@ -1,6 +1,3 @@
 ﻿namespace Orders.Saga.Contracts.Messages;
 
-public interface OrderCompleted
-{
-    
-}
+public interface OrderCompleted;

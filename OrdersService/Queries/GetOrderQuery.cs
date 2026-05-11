@@ -3,12 +3,7 @@ using OrdersService.Models;
 
 namespace OrdersService.Queries;
 
-public class GetOrderQuery : IRequest<Order>
+public record GetOrderQuery : IRequest<Order>
 {
-    public Guid Id { get; }
-
-    public GetOrderQuery(Guid id)
-    {
-        Id = id;
-    }
+    public required Guid Id { get; init; }
 }
