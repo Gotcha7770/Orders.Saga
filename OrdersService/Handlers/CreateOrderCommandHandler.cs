@@ -29,12 +29,13 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Ord
         _dbContext.Orders.Add(order);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        await _publishEndpoint.Publish<OrderCreated>(new
+        var message = new
         {
             OrderId = order.Id,
-            UserId = order.UserId
-        },
-            cancellationToken);
+            UserId = order.UserId,
+            Created = order.OrderDate
+        };
+        await _publishEndpoint.Publish<OrderCreated>(message, cancellationToken);
 
         return order;
     }

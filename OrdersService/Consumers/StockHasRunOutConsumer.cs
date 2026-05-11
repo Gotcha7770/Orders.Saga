@@ -1,11 +1,12 @@
-﻿using MassTransit;
+﻿using JetBrains.Annotations;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Orders.Saga.Contracts.Messages;
 using OrdersService.Models;
 
 namespace OrdersService.Consumers;
 
-// ReSharper disable once ClassNeverInstantiated.Global
+[UsedImplicitly]
 public class StockHasRunOutConsumer : IConsumer<StockHasRunOut>
 {
     private readonly ApplicationDbContext _dbContext;

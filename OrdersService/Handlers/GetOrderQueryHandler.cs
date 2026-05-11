@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using OrdersService.Models;
 using OrdersService.Queries;
 
@@ -15,6 +16,6 @@ public class GetOrderQueryHandler : IRequestHandler<GetOrderQuery, Order>
     
     public async Task<Order> Handle(GetOrderQuery request, CancellationToken cancellationToken)
     {
-        return await _dbContext.FindAsync<Order>(request.Id);
+        return await _dbContext.Orders.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
     }
 }

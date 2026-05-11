@@ -7,18 +7,12 @@ using PaymentService.Consumers;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add json files
-builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-    .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
-
-// Add db context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));
 
-// Add mediatr for assembly
-builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
+builder.Services
+    .AddMediatR(Assembly.GetExecutingAssembly());
 
-// Add MassTransit
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<CheckoutConsumer>();
@@ -31,7 +25,7 @@ builder.Services.AddMassTransit(x =>
             h.Username("admin");
             h.Password("rabbitmq");
         });
-        
+
         // Configure endpoints to handle events
         cfg.ConfigureEndpoints(context);
     });
@@ -39,7 +33,6 @@ builder.Services.AddMassTransit(x =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();

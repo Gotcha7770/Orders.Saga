@@ -5,7 +5,7 @@ using OrdersService.Queries;
 
 namespace OrdersService.Handlers;
 
-public class GetOrdersQueryHandler : IRequestHandler<GetOrdersQuery, Order[]>
+public class GetOrdersQueryHandler : IStreamRequestHandler<GetOrdersQuery, Order>
 {
     private readonly ApplicationDbContext _dbContext;
 
@@ -14,8 +14,8 @@ public class GetOrdersQueryHandler : IRequestHandler<GetOrdersQuery, Order[]>
         _dbContext = dbContext;
     }
     
-    public async Task<Order[]> Handle(GetOrdersQuery request, CancellationToken cancellationToken)
+    public IAsyncEnumerable<Order> Handle(GetOrdersQuery request, CancellationToken cancellationToken)
     {
-        return await _dbContext.Orders.AsNoTracking().ToArrayAsync(cancellationToken);
+        return  _dbContext.Orders.AsNoTracking().AsAsyncEnumerable();
     }
 }
