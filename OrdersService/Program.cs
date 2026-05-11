@@ -1,11 +1,11 @@
 using System.Reflection;
 using MassTransit;
+using MassTransit.EntityFrameworkCoreIntegration;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OrdersService;
 using OrdersService.Commands;
-using OrdersService.Consumers;
 using OrdersService.Queries;
 using OrdersService.OrderSaga;
 using Serilog;
@@ -19,7 +19,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services
     .AddOpenApi()
-    .AddMediatR(Assembly.GetExecutingAssembly());
+    .AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
 builder.Services.AddMassTransit(x =>
 {
@@ -49,9 +49,9 @@ builder.Services.AddMassTransit(x =>
             cfg.ConcurrencyMode = ConcurrencyMode.Pessimistic;
             cfg.LockStatementProvider = new PostgresLockStatementProvider();
             
-            cfg.AddDbContext<DbContext, OrderSagaDbContext>((_, bldr) =>
+            cfg.AddDbContext<DbContext, OrderSagaDbContext>((_, options) =>
             {
-                bldr.UseNpgsql(builder.Configuration.GetConnectionString("SagaDbConnection"));
+                options.UseNpgsql(builder.Configuration.GetConnectionString("SagaDbConnection"));
             });
         });
 });

@@ -1,5 +1,5 @@
-﻿using MassTransit.EntityFrameworkCoreIntegration;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using MassTransit.EntityFrameworkCoreIntegration;
 
 namespace OrdersService.OrderSaga;
 

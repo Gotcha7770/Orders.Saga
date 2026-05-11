@@ -1,10 +1,11 @@
-﻿using MassTransit;
+﻿using JetBrains.Annotations;
+using MassTransit;
+using Microsoft.EntityFrameworkCore;
 using Orders.Saga.Contracts.Messages;
-using PaymentService.Models;
 
 namespace PaymentService.Consumers;
 
-// ReSharper disable once ClassNeverInstantiated.Global
+[UsedImplicitly]
 public class CheckoutConsumer : IConsumer<Checkout>
 {
     private readonly ApplicationDbContext _dbContext;
@@ -16,7 +17,7 @@ public class CheckoutConsumer : IConsumer<Checkout>
     
     public async Task Consume(ConsumeContext<Checkout> context)
     {
-        var user = await _dbContext.FindAsync<User>(context.Message.UserId);
+        var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == context.Message.UserId);
         if (user is not { CanPay: true })
             throw new InvalidOperationException("User cannot pay for the order!");
 

@@ -1,6 +1,4 @@
-using System.Reflection;
 using MassTransit;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using PaymentService;
 using PaymentService.Consumers;
@@ -9,9 +7,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));
-
-builder.Services
-    .AddMediatR(Assembly.GetExecutingAssembly());
 
 builder.Services.AddMassTransit(x =>
 {

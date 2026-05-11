@@ -2,7 +2,4 @@
 
 namespace OrdersService.OrderSaga;
 
-public class OrderInstanceMap : SagaClassMap<OrderInstance>
-{
-    
-}
+public class OrderInstanceMap : SagaClassMap<OrderInstance>;

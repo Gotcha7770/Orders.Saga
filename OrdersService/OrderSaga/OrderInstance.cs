@@ -1,7 +1,9 @@
+using JetBrains.Annotations;
 using MassTransit;
 
 namespace OrdersService.OrderSaga;
 
+[UsedImplicitly]
 public class OrderInstance : SagaStateMachineInstance
 {
     public Guid CorrelationId { get; set; }

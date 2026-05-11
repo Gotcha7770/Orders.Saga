@@ -1,8 +1,10 @@
-﻿using MassTransit;
+﻿using JetBrains.Annotations;
+using MassTransit;
 using Orders.Saga.Contracts.Messages;
 
 namespace OrdersService.OrderSaga;
 
+[UsedImplicitly]
 public class OrderStateMachine : MassTransitStateMachine<OrderInstance>
 {
     public State Completed { get; init; }
